@@ -1,0 +1,12 @@
+.#init.el
+.sx/
+ac-comphist.dat
+auto-complete-auctex.el~
+auto-save-list/
+elpa/
+elpy/
+eshell/
+games/
+init.el~
+plugins/
+url/
