@@ -58,6 +58,15 @@
  '(LaTeX-clean-intermediate-suffixes
    (quote
     ("\\.aux" "\\.bbl" "\\.blg" "\\.brf" "\\.fot" "\\.glo" "\\.gls" "\\.idx" "\\.ilg" "\\.ind" "\\.lof" "\\.log" "\\.lot" "\\.nav" "\\.out" "\\.snm" "\\.toc" "\\.url" "\\.synctex\\.gz" "\\.bcf" "\\.run\\.xml" "\\.fls" "-blx\\.bib" "\\.acn" "\\.acr" "\\.alg" "\\.glg" "\\.ist" "\\tex~" "\\.fmt")))
+ '(TeX-view-program-selection
+   (quote
+    (((output-dvi has-no-display-manager)
+      "dvi2tty")
+     ((output-dvi style-pstricks)
+      "dvips and gv")
+     (output-dvi "xdvi")
+     (output-pdf "PDF Tools")
+     (output-html "xdg-open"))))
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
@@ -87,7 +96,7 @@
  '(line-number-mode nil)
  '(package-selected-packages
    (quote
-    (yasnippet-snippets visual-regexp-steroids visual-regexp w3m sx ghci-completion which-key move-text flucui-themes haskell-mode pdf-tools auto-complete-auctex auctex eww-lnum exec-path-from-shell grip-mode impatient-mode use-package s material-theme markdown-mode dracula-theme better-defaults)))
+    (xwidgete undo-tree drag-stuff idris-mode yasnippet-snippets visual-regexp-steroids visual-regexp w3m sx ghci-completion which-key move-text flucui-themes haskell-mode pdf-tools auto-complete-auctex auctex eww-lnum exec-path-from-shell grip-mode impatient-mode use-package s material-theme markdown-mode dracula-theme better-defaults)))
  '(show-paren-mode t)
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
@@ -150,12 +159,11 @@
 
 (set-default 'preview-scale-function 2.5)
 (add-hook 'latex-mode-hook '(show-paren-mode 1))
-(global-set-key [(control shift up)]  'move-line-up)
-(global-set-key [(control shift down)]  'move-line-down)
 (global-set-key "\C-cd" 'kill-whole-line)
 (global-set-key "\C-ck" "\C-a\C- \C-e\M-w")
 (global-set-key (kbd "C-h C-f") 'find-function)
-(move-text-default-bindings)
+(drag-stuff-global-mode 1)
+(drag-stuff-define-keys)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -181,7 +189,6 @@
 
 (delete-selection-mode 1)
 
-(provide 'init)
 ;;; init.el ends here
 (put 'set-goal-column 'disabled nil)
 
@@ -191,3 +198,9 @@
 (define-key global-map (kbd "C-c q") 'vr/query-replace)
 
 
+(pdf-tools-install)
+(add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
+(provide 'init)
+(put 'upcase-region 'disabled nil)
+(global-undo-tree-mode)
