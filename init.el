@@ -58,6 +58,8 @@
  '(LaTeX-clean-intermediate-suffixes
    (quote
     ("\\.aux" "\\.bbl" "\\.blg" "\\.brf" "\\.fot" "\\.glo" "\\.gls" "\\.idx" "\\.ilg" "\\.ind" "\\.lof" "\\.log" "\\.lot" "\\.nav" "\\.out" "\\.snm" "\\.toc" "\\.url" "\\.synctex\\.gz" "\\.bcf" "\\.run\\.xml" "\\.fls" "-blx\\.bib" "\\.acn" "\\.acr" "\\.alg" "\\.glg" "\\.ist" "\\tex~" "\\.fmt")))
+ '(LaTeX-command "latex")
+ '(TeX-command "luatex")
  '(TeX-view-program-selection
    (quote
     (((output-dvi has-no-display-manager)
@@ -96,7 +98,7 @@
  '(line-number-mode nil)
  '(package-selected-packages
    (quote
-    (xwidgete undo-tree drag-stuff idris-mode yasnippet-snippets visual-regexp-steroids visual-regexp w3m sx ghci-completion which-key move-text flucui-themes haskell-mode pdf-tools auto-complete-auctex auctex eww-lnum exec-path-from-shell grip-mode impatient-mode use-package s material-theme markdown-mode dracula-theme better-defaults)))
+    (ediprolog exwm xwidgete undo-tree drag-stuff idris-mode yasnippet-snippets visual-regexp-steroids visual-regexp w3m sx ghci-completion which-key move-text flucui-themes haskell-mode pdf-tools auto-complete-auctex auctex eww-lnum exec-path-from-shell grip-mode impatient-mode use-package s material-theme markdown-mode dracula-theme better-defaults)))
  '(show-paren-mode t)
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
@@ -204,3 +206,52 @@
 (provide 'init)
 (put 'upcase-region 'disabled nil)
 (global-undo-tree-mode)
+
+
+
+
+;; prolog config
+
+(setq load-path (cons "/usr/share/emacs/prolog" load-path))
+(autoload 'run-prolog "prolog" "Start a Prolog sub-process." t)
+(autoload 'prolog-mode "prolog" "Major mode for editing Prolog programs." t)
+(autoload 'mercury-mode "prolog" "Major mode for editing Mercury programs." t)
+(setq prolog-system 'swi)
+(setq auto-mode-alist (append '(("\\.pl$" . prolog-mode)
+                                ("\\.m$" . mercury-mode))
+			      auto-mode-alist))
+(defun prolog-insert-comment-block ()
+  "Insert a PceEmacs-style comment block like /* - - ... - - */ "
+  (interactive)
+  (let ((dashes "-"))
+    (dotimes (_ 36) (setq dashes (concat "- " dashes)))
+    (insert (format "/* %s\n\n%s */" dashes dashes))
+    (forward-line -1)
+    (indent-for-tab-command)))
+
+(global-set-key "\C-cc" 'prolog-insert-comment-block)
+
+(global-set-key "\C-cl" (lambda ()
+                          (interactive)
+                          (insert ":- use_module(library()).")
+                          (forward-char -3)))
+
+(add-hook 'prolog-mode-hook
+          (lambda ()
+            (require 'flymake)
+            (make-local-variable 'flymake-allowed-file-name-masks)
+            (make-local-variable 'flymake-err-line-patterns)
+            (setq flymake-err-line-patterns
+                  '(("ERROR: (?\\(.*?\\):\\([0-9]+\\)" 1 2)
+                    ("Warning: (\\(.*\\):\\([0-9]+\\)" 1 2)))
+            (setq flymake-allowed-file-name-masks
+                  '(("\\.pl\\'" flymake-prolog-init)))
+            (flymake-mode 1)))
+
+(defun flymake-prolog-init ()
+  (let* ((temp-file   (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+         (local-file  (file-relative-name
+                       temp-file
+                       (file-name-directory buffer-file-name))))
+    (list "swipl" (list "-q" "-t" "halt" "-s " local-file))))
