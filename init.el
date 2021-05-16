@@ -8,16 +8,10 @@
 ;; Enables basic packaging support
 
 
-
-;;; Commentary:
-;; 
-
 (require 'package)
 ;;;
 ;;; Code:
-
 (push "~/.emacs.d/config" load-path)
-
 
 ;; Adds the Melpa archive to the list of available repositories
 (add-to-list 'package-archives
@@ -34,20 +28,18 @@
   (package-refresh-contents))
 
 ;; Installs packages
-;;
+
 ;; myPackages contains a list of package names
 
 
 
-(load "markdown-config")
-(load "haskell-config")
-;;(load "auctex-config")
+(load "auctex-config")
 ;; ===================================
 ;; Basic Customization
 ;; ===================================
 
 (setq inhibit-startup-message t)    ;; Hide the startup message
-(load-theme 'flucui-light t)            ;; Load material theme
+; (load-theme 'flucui-light t)	    ;; Load material theme
 (global-linum-mode t)               ;; Enable line numbers
 
 (custom-set-variables
@@ -75,17 +67,19 @@
    (vector "#212121" "#B71C1C" "#558b2f" "#FFA000" "#2196f3" "#4527A0" "#00796b" "#FAFAFA"))
  '(company-backends
    (quote
-    ((company-auctex-macros company-auctex-symbols company-auctex-environments company-yasnippet)
+    (company-capf
+     (company-auctex-macros company-auctex-symbols company-auctex-environments)
+     (company-auctex-macros company-auctex-symbols company-auctex-environments company-yasnippet)
      (company-auctex)
      (company-yasnippet company-auctex-symbols company-auctex-environments company-auctex-macros)
      company-auctex-bibs company-auctex-labels company-bbdb company-eclim company-semantic company-clang company-xcode company-cmake company-capf company-files
      (company-dabbrev-code company-gtags company-etags company-keywords)
      company-oddmuse company-dabbrev)))
  '(company-idle-delay 0)
- '(custom-enabled-themes (quote (flucui-light)))
+ '(custom-enabled-themes (quote (atom-one-dark)))
  '(custom-safe-themes
    (quote
-    ("732b807b0543855541743429c9979ebfb363e27ec91e82f463c91e68c772f6e3" "a11808699b77d62f5d10dd73cd474af3057d84cceac8f0301b82ad3e4fb0433e" "a24c5b3c12d147da6cef80938dca1223b7c7f70f2f382b26308eba014dc4833a" "cf9f20cab61999609e47b969f6d7a89c148e16f94ae3f2f127fecfc27dc878d3" default)))
+    ("171d1ae90e46978eb9c342be6658d937a83aaa45997b1d7af7657546cae5985b" "732b807b0543855541743429c9979ebfb363e27ec91e82f463c91e68c772f6e3" "a11808699b77d62f5d10dd73cd474af3057d84cceac8f0301b82ad3e4fb0433e" "a24c5b3c12d147da6cef80938dca1223b7c7f70f2f382b26308eba014dc4833a" "cf9f20cab61999609e47b969f6d7a89c148e16f94ae3f2f127fecfc27dc878d3" default)))
  '(fci-rule-color "#ECEFF1")
  '(haskell-interactive-popup-errors nil)
  '(haskell-mode-hook (quote (interactive-haskell-mode)))
@@ -95,11 +89,19 @@
  '(haskell-process-type (quote cabal-repl))
  '(haskell-tags-on-save t)
  '(hl-sexp-background-color "#efebe9")
+ '(indent-tabs-mode t)
+ '(ivy-mode t)
  '(line-number-mode nil)
  '(package-selected-packages
    (quote
-    (ediprolog exwm xwidgete undo-tree drag-stuff idris-mode yasnippet-snippets visual-regexp-steroids visual-regexp w3m sx ghci-completion which-key move-text flucui-themes haskell-mode pdf-tools auto-complete-auctex auctex eww-lnum exec-path-from-shell grip-mode impatient-mode use-package s material-theme markdown-mode dracula-theme better-defaults)))
+    (yaml-mode lsp-haskell lsp-ui bash-completion inf-elixir atom-one-dark-theme dash dash-functional alchemist elixir-mode lsp-mode org-chef proof-general ggtags neotree ivy projectile realgud blacken py-autopep8 elpy comment-dwim-2 centaur-tabs magit ediprolog exwm xwidgete undo-tree drag-stuff idris-mode yasnippet-snippets visual-regexp-steroids visual-regexp w3m sx ghci-completion which-key move-text flucui-themes haskell-mode pdf-tools auto-complete-auctex auctex eww-lnum exec-path-from-shell grip-mode impatient-mode use-package s material-theme markdown-mode dracula-theme better-defaults)))
+ '(projectile-completion-system (quote ivy))
+ '(projectile-globally-ignored-directories
+   (quote
+    (".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" ".ccls-cache" ".cache" ".clangd" "venv")))
+ '(projectile-tags-command "ggtags")
  '(show-paren-mode t)
+ '(tab-always-indent (quote complete))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
@@ -123,20 +125,31 @@
      (360 . "#558b2f"))))
  '(vc-annotate-very-old-color nil)
  '(visible-bell t))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(haskell-interactive-face-compile-error ((t (:inherit compilation-error)))))
 
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
 
-(require 'haskell-interactive-mode)
-(require 'haskell-process)
-(add-hook 'haskell-mode-hook 'haskell-mode 'interactive-haskell-mode)
+(use-package flycheck
+  :ensure t
+  :init
+  (global-flycheck-mode t))
+(use-package yasnippet
+  :ensure t)
+(use-package lsp-mode
+  :ensure t
+  :hook (haskell-mode . lsp)
+  :commands lsp)
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode)
+(use-package lsp-haskell
+  :ensure t
+  :config
+ (setq lsp-haskell-server-path "haskell-language-server-wrapper")
+ (setq lsp-haskell-server-args ())
+   ;; Comment/uncomment this line to see interactions between lsp client/server.
+  (setq lsp-log-io t))
 
 ; Reduce the number of times the bell rings
 ; Turn off the bell for the listed functions.
@@ -181,17 +194,17 @@
   (add-hook 'after-init-hook 'global-company-mode))
 
 
-(push '(company-yasnippet :with company-auctex) company-backends)
-;;(add-to-list 'company-backends 'company-auctex)
-;;(add-to-list 'company-backends 'company-yasnippet)
+;;(push '(company-yasnippet :with company-auctex) company-backends)
+
 (setq python-shell-interpreter "python3")
 
 (global-flycheck-mode)
 (company-auctex-init)
+(setq company-dabbrev-downcase nil)
+
 
 (delete-selection-mode 1)
 
-;;; init.el ends here
 (put 'set-goal-column 'disabled nil)
 
 
@@ -255,3 +268,86 @@
                        temp-file
                        (file-name-directory buffer-file-name))))
     (list "swipl" (list "-q" "-t" "halt" "-s " local-file))))
+
+(global-set-key (kbd "M-;") 'comment-dwim-2)
+
+
+; python config
+(elpy-enable)
+(setq elpy-rpc-python-command "python3")
+
+(when (require 'flycheck nil t)
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (add-hook 'elpy-mode-hook 'flycheck-mode))
+
+(require 'py-autopep8)
+(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+
+
+;projectile
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (setq projectile-switch-project-action #'projectile-dired))
+
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+(use-package magit)
+
+
+(require 'lsp-mode)
+(add-hook 'elixir-mode-hook #'lsp)
+
+(use-package lsp-mode
+    :commands lsp
+    :ensure t
+    :diminish lsp-mode
+    :hook
+    (elixir-mode . lsp)
+    :init
+    (add-to-list 'exec-path "~/elixir/elixir-ls/release"))
+
+(defvar lsp-elixir--config-options (make-hash-table))
+
+ (add-hook 'lsp-after-initialize-hook
+          (lambda ()
+            (lsp--set-configuration `(:elixirLS, lsp-elixir--config-options))))
+
+(add-to-list 'auto-mode-alist '("\\.elixir2\\'" . elixir-mode))
+
+
+
+(setq backup-directory-alist
+      `(("." . ,(concat user-emacs-directory "backups"))))
+
+(with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
+
+
+(use-package inf-elixir
+  :bind (("C-c i i" . 'inf-elixir)
+         ("C-c i p" . 'inf-elixir-project)
+         ("C-c i l" . 'inf-elixir-send-line)
+         ("C-c i r" . 'inf-elixir-send-region)
+         ("C-c i b" . 'inf-elixir-send-buffer)))
+
+(autoload 'bash-completion-dynamic-complete
+  "bash-completion"
+  "BASH completion hook")
+(add-hook 'shell-dynamic-complete-functions
+  'bash-completion-dynamic-complete)
+
+
+(add-to-list 'load-path "~/.emacs.d/company-elixir/")
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(haskell-interactive-face-compile-error ((t (:inherit compilation-error)))))

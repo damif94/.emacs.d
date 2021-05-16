@@ -1,0 +1,24 @@
+ls
+find 
+find / -name *.tex
+sudo find / -name *.tex
+sudo find ~/ -name *.tex
+ls
+mkdir ITI
+mv ejercicio9.tex ejercicio9.pdf ITI
+cd ITI
+cp ejercicio9.tex ejercicio8.tex
+ls
+evince
+evince &
+echo $PATH
+evince derivacion.pdf 
+ls
+cd Monografia/
+mkdir Scratch
+rm -rf ../.emacs.d/elpa/auto-complete-20170125.245/
+rm -rf ../.emacs.d/elpa/auto-complete-auctex-20140223.1758/
+cabal install stylish-haskell
+cabal install stylish-haskell
+cabal --version
+cabal install present

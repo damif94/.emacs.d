@@ -1,0 +1,1 @@
+("~/Haskell/typelixir/" "~/.emacs.d/" "~/Haskell/" "~/elixir/kv/" "~/elixir/elixir-ls/" "~/termsaver-figlet/" "~/" "~/Documents/djangorest/firstProject/" "~/Downloads/global-6.6/")
